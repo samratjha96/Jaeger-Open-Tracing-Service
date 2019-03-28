@@ -24,26 +24,55 @@ const options = {
 
 const tracer = initTracer(config, options);
 
-endpoints.listen(3000, () => {
-  console.log("Listening on port 3000");
+endpoints.listen(4000, () => {
+  console.log("Listening on port 4000");
 })
 
-endpoints.get("/url", (req, res, next) => {
-  const span = tracer.startSpan("ENDPOINT");
-  res.json(["Tony","Lisa","Michael","Ginger","Food"]);
-  span.setTag("GET", "url");
-  span.log({ 'event': "Check URL" });
-  span.finish();
+endpoints.get("/", (req, res, next) => {
+  const span = tracer.startSpan("HOMEPAGE");
+  res.send("Welcome to a Jaeger tracing example");
+  sleep("HOMEPAGE").then( () => {
+    span.setTag("GET", "Home");
+    span.finish();
+  });
+}); 
+
+endpoints.get("/github", (req, res, next) => {
+  const span = tracer.startSpan("GITHUB");
+  request(
+    { headers: {
+    'User-Agent': 'Test'
+    },
+    uri: 'https://api.github.com/repos/opentracing/opentracing-javascript/pulls'
+   }, 
+   function(error, response, body) {
+      console.log('error:', error);
+      console.log('statusCode:', response && response.statusCode);
+      res.json(JSON.stringify(body, null, 2));
+    });
+  sleep("GITHUB").then(() => {
+    span.setTag("GET", "GITHUB");
+    span.log({ 'event': "Check Github Pull Requests" });
+    span.finish();
+  })
 });
 
 endpoints.get("/google", (req, res, next) => {
-  const span = tracer.startSpan("ENDPOINT");
+  const span = tracer.startSpan("GOOGLE");
   request('http://www.google.com', function (error, response, body) {
-    console.log('error:', error); // Print the error if one occurred
-    console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-    res.send(body); // Print the HTML for the Google homepage.
+    console.log('error:', error);
+    console.log('statusCode:', response && response.statusCode);
+    res.send(body); 
   });
-  span.setTag("GET", "Google");
-  span.log({ 'event': "Displaying Google Homepage" });
-  span.finish();
+  sleep("GOOGLE").then(() => {
+    span.setTag("GET", "Google");
+    span.log({ 'event': "Displaying Google Homepage" });
+    span.finish();
+  }); 
 });
+
+function sleep(endpoint) {
+  var randomSleepTime = Math.random() * (5000 - 1000) + 1000;
+  console.log("In " + endpoint + " sleeping for " + Math.floor(randomSleepTime) + " milliseconds");
+  return new Promise(resolve => setTimeout(resolve, randomSleepTime));
+}
