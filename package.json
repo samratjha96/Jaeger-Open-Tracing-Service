@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "jaeger-client": "^3.14.4"
+    "express": "^4.16.4",
+    "jaeger-client": "^3.14.4",
+    "request": "^2.88.0"
   }
 }
