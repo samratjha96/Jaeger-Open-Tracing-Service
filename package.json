@@ -1,0 +1,14 @@
+{
+  "name": "jaeger-tracing",
+  "version": "1.0.0",
+  "description": "Sample jaeger tracing app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "jaeger-client": "^3.14.4"
+  }
+}
